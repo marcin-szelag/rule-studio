@@ -16,6 +16,7 @@ import DefaultClassificationResultSelector from "../Calculations/DefaultClassifi
 import NumberOfFoldsSelector from "../Calculations/NumberOfFoldsSelector";
 import SeedSelector from "../Calculations/SeedSelector";
 import ThresholdSelector from "../Calculations/ThresholdSelector";
+import FilterSelector from "../Calculations/FilterSelector";
 import TypeOfClassifierSelector from "../Calculations/TypeOfClassifierSelector";
 import TypeOfRulesSelector from "../Calculations/TypeOfRulesSelector";
 import TypeOfUnionsSelector from "../Calculations/TypeOfUnionsSelector";
@@ -66,10 +67,11 @@ class CrossValidation extends Component {
             calculationsTime: "-",
             parameters: {
                 consistencyThreshold: 0,
+                filterSelector: "",
                 defaultClassificationResultType: "majorityDecisionClass",
                 numberOfFolds: 10,
                 seed: 0,
-                classifierType: "SimpleRuleClassifier",
+                classifierType: "SimpleOptimizingCountingRuleClassifier",
                 typeOfRules: "certain",
                 typeOfUnions: "monotonic",
             },
@@ -522,8 +524,22 @@ class CrossValidation extends Component {
             return;
         }
 
+        if (!loading) {
+	        this.setState(({parameters}) => ({
+	            parameters: {...parameters, consistencyThreshold: threshold},
+	            parametersSaved: false
+	        }));
+        }
+    };
+    
+    onFilterSelectorChange = (filterTxt) => {
+        const { loading } = this.state;
+        if (loading.crossValidation || loading.selectedFold) {
+            return;
+        }
+
         this.setState(({parameters}) => ({
-            parameters: {...parameters, consistencyThreshold: threshold},
+            parameters: {...parameters, filterSelector: filterTxt},
             parametersSaved: false
         }));
     };
@@ -703,10 +719,17 @@ class CrossValidation extends Component {
                         variant={"extended"}
                     />
                     <ThresholdSelector
+                    	style={{marginBottom: 16}}
                         keepChanges={parameters.typeOfRules !== "possible"}
                         onChange={this.onConsistencyThresholdChange}
                         value={parameters.consistencyThreshold}
                         variant={"extended"}
+                    />
+                    <FilterSelector
+	                    TextFieldProps={{
+	                        onChange: event => this.onFilterSelectorChange(event.target.value),
+	                        value: parameters.filterSelector
+	                    }}
                     />
                     <StyledDivider
                         color={"secondary"}

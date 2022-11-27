@@ -1,6 +1,14 @@
 package pl.put.poznan.rulestudio.service;
 
-import it.unimi.dsi.fastutil.ints.IntArraySet;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.UUID;
+
 import org.rulelearn.approximations.Union;
 import org.rulelearn.approximations.Unions;
 import org.rulelearn.approximations.VCDominanceBasedRoughSetCalculator;
@@ -8,7 +16,26 @@ import org.rulelearn.core.UnknownValueException;
 import org.rulelearn.data.Attribute;
 import org.rulelearn.data.InformationTable;
 import org.rulelearn.measures.dominance.EpsilonConsistencyMeasure;
-import org.rulelearn.rules.*;
+import org.rulelearn.rules.ApproximatedSetProvider;
+import org.rulelearn.rules.ApproximatedSetRuleDecisionsProvider;
+import org.rulelearn.rules.AttributeOrderRuleConditionsPruner;
+import org.rulelearn.rules.BasicRuleCoverageInformation;
+import org.rulelearn.rules.CertainRuleInducerComponents;
+import org.rulelearn.rules.CompositeRuleCharacteristicsFilter;
+import org.rulelearn.rules.EvaluationAndCoverageStoppingConditionChecker;
+import org.rulelearn.rules.PossibleRuleInducerComponents;
+import org.rulelearn.rules.Rule;
+import org.rulelearn.rules.RuleCharacteristics;
+import org.rulelearn.rules.RuleConditions;
+import org.rulelearn.rules.RuleCoverageInformation;
+import org.rulelearn.rules.RuleInducerComponents;
+import org.rulelearn.rules.RuleInductionStoppingConditionChecker;
+import org.rulelearn.rules.RuleSemantics;
+import org.rulelearn.rules.RuleSetWithCharacteristics;
+import org.rulelearn.rules.RuleSetWithComputableCharacteristics;
+import org.rulelearn.rules.UnionProvider;
+import org.rulelearn.rules.UnionWithSingleLimitingDecisionRuleDecisionsProvider;
+import org.rulelearn.rules.VCDomLEM;
 import org.rulelearn.rules.ruleml.RuleMLBuilder;
 import org.rulelearn.rules.ruleml.RuleParseException;
 import org.rulelearn.rules.ruleml.RuleParser;
@@ -18,21 +45,37 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import it.unimi.dsi.fastutil.ints.IntArraySet;
 import pl.put.poznan.rulestudio.enums.OrderByRuleCharacteristic;
 import pl.put.poznan.rulestudio.enums.RuleType;
 import pl.put.poznan.rulestudio.enums.RulesFormat;
-import pl.put.poznan.rulestudio.exception.*;
-import pl.put.poznan.rulestudio.model.*;
+import pl.put.poznan.rulestudio.exception.EmptyResponseException;
+import pl.put.poznan.rulestudio.exception.NoDataException;
+import pl.put.poznan.rulestudio.exception.NoRulesException;
+import pl.put.poznan.rulestudio.exception.NotSuitableForInductionOfPossibleRulesException;
+import pl.put.poznan.rulestudio.exception.WrongParameterException;
+import pl.put.poznan.rulestudio.model.CalculationsStopWatch;
+import pl.put.poznan.rulestudio.model.DescriptiveAttributes;
+import pl.put.poznan.rulestudio.model.NamedResource;
+import pl.put.poznan.rulestudio.model.Project;
+import pl.put.poznan.rulestudio.model.ProjectClassUnions;
+import pl.put.poznan.rulestudio.model.ProjectRules;
+import pl.put.poznan.rulestudio.model.ProjectsContainer;
+import pl.put.poznan.rulestudio.model.RuLeStudioRule;
+import pl.put.poznan.rulestudio.model.RuLeStudioRuleSet;
+import pl.put.poznan.rulestudio.model.ValidityRulesContainer;
 import pl.put.poznan.rulestudio.model.parameters.RulesParameters;
-import pl.put.poznan.rulestudio.model.response.*;
+import pl.put.poznan.rulestudio.model.response.AttributeFieldsResponse;
 import pl.put.poznan.rulestudio.model.response.AttributeFieldsResponse.AttributeFieldsResponseBuilder;
+import pl.put.poznan.rulestudio.model.response.ChosenRuleResponse;
 import pl.put.poznan.rulestudio.model.response.ChosenRuleResponse.ChosenRuleResponseBuilder;
+import pl.put.poznan.rulestudio.model.response.DescriptiveAttributesResponse;
+import pl.put.poznan.rulestudio.model.response.MainRulesResponse;
 import pl.put.poznan.rulestudio.model.response.MainRulesResponse.MainRulesResponseBuilder;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
+import pl.put.poznan.rulestudio.model.response.ObjectAbstractResponse;
+import pl.put.poznan.rulestudio.model.response.ObjectResponse;
+import pl.put.poznan.rulestudio.model.response.ObjectWithAttributesResponse;
 
 @Service
 public class RulesService {
@@ -195,7 +238,7 @@ public class RulesService {
         return ruleSetWithCharacteristics;
     }
 
-    public static RuleSetWithCharacteristics calculateRuleSetWithCharacteristics(Unions unions, RuleType typeOfRules) {
+    public static RuleSetWithCharacteristics calculateRuleSetWithCharacteristics(Unions unions, RuleType typeOfRules, String filterSelector) {
         if((typeOfRules == RuleType.POSSIBLE) || (typeOfRules == RuleType.BOTH)) {
             if(!unions.getInformationTable().isSuitableForInductionOfPossibleRules()) {
                 NotSuitableForInductionOfPossibleRulesException ex = new NotSuitableForInductionOfPossibleRulesException("Creating possible rules is not possible - learning data contain missing attribute values that can lead to non-transitivity of dominance/indiscernibility relation.");
@@ -220,11 +263,11 @@ public class RulesService {
             ruleInducerComponents = new PossibleRuleInducerComponents.Builder().
                     build();
 
-            rules = (new VCDomLEM(ruleInducerComponents, unionAtLeastProvider, unionRuleDecisionsProvider)).generateRules();
+            rules = (new VCDomLEM(ruleInducerComponents, unionAtLeastProvider, unionRuleDecisionsProvider)).generateAndFilterRules(CompositeRuleCharacteristicsFilter.of(filterSelector));
             rules.calculateAllCharacteristics();
             resultSet = rules;
 
-            rules = (new VCDomLEM(ruleInducerComponents, unionAtMostProvider, unionRuleDecisionsProvider)).generateRules();
+            rules = (new VCDomLEM(ruleInducerComponents, unionAtMostProvider, unionRuleDecisionsProvider)).generateAndFilterRules(CompositeRuleCharacteristicsFilter.of(filterSelector));
             rules.calculateAllCharacteristics();
             resultSet = RuleSetWithCharacteristics.join(resultSet, rules);
         }
@@ -244,7 +287,7 @@ public class RulesService {
                     ruleConditionsPruner(new AttributeOrderRuleConditionsPruner(stoppingConditionChecker)).
                     build();
 
-            rules = (new VCDomLEM(ruleInducerComponents, unionAtLeastProvider, unionRuleDecisionsProvider)).generateRules();
+            rules = (new VCDomLEM(ruleInducerComponents, unionAtLeastProvider, unionRuleDecisionsProvider)).generateAndFilterRules(CompositeRuleCharacteristicsFilter.of(filterSelector));
             rules.calculateAllCharacteristics();
             if(resultSet == null) {
                 resultSet = rules;
@@ -252,7 +295,7 @@ public class RulesService {
                 resultSet = RuleSetWithCharacteristics.join(resultSet, rules);
             }
 
-            rules = (new VCDomLEM(ruleInducerComponents, unionAtMostProvider, unionRuleDecisionsProvider)).generateRules();
+            rules = (new VCDomLEM(ruleInducerComponents, unionAtMostProvider, unionRuleDecisionsProvider)).generateAndFilterRules(CompositeRuleCharacteristicsFilter.of(filterSelector));
             rules.calculateAllCharacteristics();
             resultSet = RuleSetWithCharacteristics.join(resultSet, rules);
         }
@@ -273,7 +316,7 @@ public class RulesService {
 
         CalculationsStopWatch calculationsStopWatch = new CalculationsStopWatch();
 
-        RuleSetWithCharacteristics ruleSetWithCharacteristics = calculateRuleSetWithCharacteristics(projectClassUnions.getUnions(), rulesParameters.getTypeOfRules());
+        RuleSetWithCharacteristics ruleSetWithCharacteristics = calculateRuleSetWithCharacteristics(projectClassUnions.getUnions(), rulesParameters.getTypeOfRules(), rulesParameters.getFilterSelector());
 
         ArrayList<String> descriptiveAttributesPriorityArrayList = new ArrayList<>();
         if (previousProjectRules != null) {

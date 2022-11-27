@@ -1,36 +1,57 @@
 package pl.put.poznan.rulestudio.service;
 
-import it.unimi.dsi.fastutil.ints.IntList;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
 import org.rulelearn.approximations.UnionsWithSingleLimitingDecision;
 import org.rulelearn.data.Decision;
 import org.rulelearn.data.Index2IdMapper;
 import org.rulelearn.data.InformationTable;
-import org.rulelearn.rules.*;
+import org.rulelearn.rules.RuleSetWithCharacteristics;
 import org.rulelearn.sampling.CrossValidator;
 import org.rulelearn.validation.OrdinalMisclassificationMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.put.poznan.rulestudio.enums.*;
+
+import it.unimi.dsi.fastutil.ints.IntList;
+import pl.put.poznan.rulestudio.enums.MisclassificationMatrixType;
 import pl.put.poznan.rulestudio.exception.EmptyResponseException;
 import pl.put.poznan.rulestudio.exception.WrongParameterException;
-import pl.put.poznan.rulestudio.model.*;
+import pl.put.poznan.rulestudio.model.CalculationsStopWatch;
+import pl.put.poznan.rulestudio.model.CrossValidation;
+import pl.put.poznan.rulestudio.model.CrossValidationSingleFold;
+import pl.put.poznan.rulestudio.model.DescriptiveAttributes;
+import pl.put.poznan.rulestudio.model.FoldClassification;
+import pl.put.poznan.rulestudio.model.Project;
+import pl.put.poznan.rulestudio.model.ProjectsContainer;
+import pl.put.poznan.rulestudio.model.RuLeStudioRule;
+import pl.put.poznan.rulestudio.model.RuLeStudioRuleSet;
 import pl.put.poznan.rulestudio.model.parameters.CrossValidationParameters;
 import pl.put.poznan.rulestudio.model.parameters.CrossValidationParametersImpl;
-import pl.put.poznan.rulestudio.model.response.*;
+import pl.put.poznan.rulestudio.model.response.AttributeFieldsResponse;
 import pl.put.poznan.rulestudio.model.response.AttributeFieldsResponse.AttributeFieldsResponseBuilder;
+import pl.put.poznan.rulestudio.model.response.ChosenClassifiedObjectAbstractResponse;
+import pl.put.poznan.rulestudio.model.response.ChosenClassifiedObjectResponse;
+import pl.put.poznan.rulestudio.model.response.ChosenClassifiedObjectWithAttributesResponse;
+import pl.put.poznan.rulestudio.model.response.ChosenCrossValidationFoldResponse;
 import pl.put.poznan.rulestudio.model.response.ChosenCrossValidationFoldResponse.ChosenCrossValidationFoldResponseBuilder;
+import pl.put.poznan.rulestudio.model.response.ChosenRuleResponse;
+import pl.put.poznan.rulestudio.model.response.DescriptiveAttributesResponse;
+import pl.put.poznan.rulestudio.model.response.MainCrossValidationResponse;
 import pl.put.poznan.rulestudio.model.response.MainCrossValidationResponse.MainCrossValidationResponseBuilder;
+import pl.put.poznan.rulestudio.model.response.ObjectAbstractResponse;
+import pl.put.poznan.rulestudio.model.response.ObjectResponse;
+import pl.put.poznan.rulestudio.model.response.ObjectWithAttributesResponse;
+import pl.put.poznan.rulestudio.model.response.OrdinalMisclassificationMatrixAbstractResponse;
 import pl.put.poznan.rulestudio.model.response.OrdinalMisclassificationMatrixResponse.OrdinalMisclassificationMatrixResponseBuilder;
 import pl.put.poznan.rulestudio.model.response.OrdinalMisclassificationMatrixWithoutDeviationResponse.OrdinalMisclassificationMatrixWithoutDeviationResponseBuilder;
+import pl.put.poznan.rulestudio.model.response.RuleMainPropertiesResponse;
 import pl.put.poznan.rulestudio.model.response.RuleMainPropertiesResponse.RuleMainPropertiesResponseBuilder;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 @Service
 public class CrossValidationService {
@@ -128,7 +149,10 @@ public class CrossValidationService {
             final InformationTable validationTable = folds.get(i).getValidationTable();
 
             final UnionsWithSingleLimitingDecision unionsWithSingleLimitingDecision = UnionsService.calculateUnionsWithSingleLimitingDecision(trainingTable, (CrossValidationParametersImpl) crossValidationParameters);
-            final RuleSetWithCharacteristics ruleSetWithCharacteristics = RulesService.calculateRuleSetWithCharacteristics(unionsWithSingleLimitingDecision, ((CrossValidationParametersImpl) crossValidationParameters).getTypeOfRules());
+            final RuleSetWithCharacteristics ruleSetWithCharacteristics = RulesService.calculateRuleSetWithCharacteristics(
+            		unionsWithSingleLimitingDecision,
+            		((CrossValidationParametersImpl) crossValidationParameters).getTypeOfRules(),
+            		((CrossValidationParametersImpl) crossValidationParameters).getFilterSelector());
 
             final FoldClassification foldClassification = new FoldClassification(trainingTable, validationTable, (CrossValidationParametersImpl) crossValidationParameters, ruleSetWithCharacteristics, orderOfDecisions);
 

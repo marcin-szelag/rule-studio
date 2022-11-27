@@ -12,7 +12,7 @@ const tooltip = {
     simpleRuleClassifier: " - takes into account separately at least and at most rules. " +
         "If all rules covering classified object are of the same type (at least or at most), " +
         "then calculates intersection of decisions and chooses the most prudent one. " +
-        "E.g. for decisions “class \u2265 medium” and “class \u2265 good”, the intersection is “class \u2265 good”, " +
+        "E.g., for decisions “class \u2265 medium” and “class \u2265 good”, the intersection is “class \u2265 good”, " +
         "and the most prudent decision is “good”. Analogically, for decisions “class \u2264 low” and “class \u2264 medium”, " +
         "the intersection is “class \u2264 low”, and the most prudent decision is “low”. " +
         "If there are covering rules of both types, then calculates most prudent decisions separately for covering rules of each type, " +

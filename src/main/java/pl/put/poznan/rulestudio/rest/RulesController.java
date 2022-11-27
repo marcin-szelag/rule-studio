@@ -1,5 +1,10 @@
 package pl.put.poznan.rulestudio.rest;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +12,14 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import pl.put.poznan.rulestudio.enums.OrderByRuleCharacteristic;
 import pl.put.poznan.rulestudio.enums.RuleType;
 import pl.put.poznan.rulestudio.enums.RulesFormat;
@@ -17,13 +28,12 @@ import pl.put.poznan.rulestudio.exception.WrongParameterException;
 import pl.put.poznan.rulestudio.model.NamedResource;
 import pl.put.poznan.rulestudio.model.parameters.RulesParameters;
 import pl.put.poznan.rulestudio.model.parameters.RulesParametersImpl;
-import pl.put.poznan.rulestudio.model.response.*;
+import pl.put.poznan.rulestudio.model.response.AttributeFieldsResponse;
+import pl.put.poznan.rulestudio.model.response.ChosenRuleResponse;
+import pl.put.poznan.rulestudio.model.response.DescriptiveAttributesResponse;
+import pl.put.poznan.rulestudio.model.response.MainRulesResponse;
+import pl.put.poznan.rulestudio.model.response.ObjectAbstractResponse;
 import pl.put.poznan.rulestudio.service.RulesService;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
-import java.util.UUID;
 
 @CrossOrigin(exposedHeaders = {"Content-Disposition"})
 @RequestMapping("/projects/{id}/rules")
@@ -57,10 +67,11 @@ public class RulesController {
             @PathVariable("id") UUID id,
             @RequestParam(name = "typeOfUnions") UnionType typeOfUnions,
             @RequestParam(name = "consistencyThreshold") Double consistencyThreshold,
-            @RequestParam(name = "typeOfRules") RuleType typeOfRules) {
+            @RequestParam(name = "typeOfRules") RuleType typeOfRules,
+    		@RequestParam(name = "filterSelector") String filterSelector) {
         logger.info("[START] Putting rules...");
 
-        final RulesParameters rulesParameters = RulesParametersImpl.getInstance(typeOfUnions, consistencyThreshold, typeOfRules);
+        final RulesParameters rulesParameters = RulesParametersImpl.getInstance(typeOfUnions, consistencyThreshold, typeOfRules, filterSelector);
         final MainRulesResponse result = rulesService.putRules(id, rulesParameters);
 
         logger.info("[ END ] Putting rules is done.");
@@ -73,11 +84,12 @@ public class RulesController {
             @RequestParam(name = "typeOfUnions") UnionType typeOfUnions,
             @RequestParam(name = "consistencyThreshold") Double consistencyThreshold,
             @RequestParam(name = "typeOfRules") RuleType typeOfRules,
+            @RequestParam(name = "filterSelector") String filterSelector,
             @RequestParam(name = "metadata") String metadata,
             @RequestParam(name = "data") String data) throws IOException {
         logger.info("[START] Posting rules...");
 
-        final RulesParameters rulesParameters = RulesParametersImpl.getInstance(typeOfUnions, consistencyThreshold, typeOfRules);
+        final RulesParameters rulesParameters = RulesParametersImpl.getInstance(typeOfUnions, consistencyThreshold, typeOfRules, filterSelector);
         final MainRulesResponse result = rulesService.postRules(id, rulesParameters, metadata, data);
 
         logger.info("[ END ] Posting rules is done.");

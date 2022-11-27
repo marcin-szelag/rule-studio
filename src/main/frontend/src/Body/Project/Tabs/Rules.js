@@ -11,6 +11,7 @@ import filterFunction from "../Filtering/FilterFunction";
 import FilterTextField from "../Filtering/FilterTextField";
 import { CalculateButton, SettingsButton, SortButton, StyledIconButton } from "../../../Utils/Buttons";
 import ThresholdSelector from "../Calculations/ThresholdSelector";
+import FilterSelector from "../Calculations/FilterSelector";
 import TypeOfUnionsSelector from "../Calculations/TypeOfUnionsSelector";
 import TypeOfRulesSelector from "../Calculations/TypeOfRulesSelector";
 import CustomBox from "../../../Utils/Containers/CustomBox";
@@ -59,7 +60,8 @@ class Rules extends Component {
             parameters: {
                 consistencyThreshold: 0,
                 typeOfRules: "certain",
-                typeOfUnions: "monotonic"
+                typeOfUnions: "monotonic",
+                filterSelector: ""
             },
             parametersSaved: true,
             selectedItem: null,
@@ -136,12 +138,12 @@ class Rules extends Component {
             if (this._isMounted) {
                 const { displayedItems } = this.state;
                 const { project: { parameters, parametersSaved, sortParams }} = this.props;
-                const { consistencyThreshold, typeOfRules, typeOfUnions } = parameters;
+                const { consistencyThreshold, typeOfRules, typeOfUnions, filterSelector } = parameters;
 
                 this.setState(({parameters, sort}) => ({
                     loading: false,
                     parameters: parametersSaved ?
-                        parameters : { ...parameters, ...{ consistencyThreshold, typeOfRules, typeOfUnions } },
+                        parameters : { ...parameters, ...{ consistencyThreshold, typeOfRules, typeOfUnions, filterSelector } },
                     parametersSaved: parametersSaved,
                     sort: { ...sort, ...sortParams.rules },
                     selectedItem: null
@@ -221,7 +223,8 @@ class Rules extends Component {
                 project.parameters = {
                     ...project.parameters,
                     consistencyThreshold: parameters.consistencyThreshold,
-                    typeOfRules: parameters.typeOfRules
+                    typeOfRules: parameters.typeOfRules,
+                    filterSelector: parameters.filterSelector
                 };
                 project.parametersSaved = parametersSaved;
             }
@@ -255,7 +258,8 @@ class Rules extends Component {
             project.parameters = {
                 ...project.parameters,
                 consistencyThreshold: parameters.consistencyThreshold,
-                typeOfRules: parameters.typeOfRules
+                typeOfRules: parameters.typeOfRules,
+                filterSelector: parameters.filterSelector
             };
             project.parametersSaved = parametersSaved;
         }
@@ -306,7 +310,8 @@ class Rules extends Component {
                     projectCopy.parameters = {
                         ...projectCopy.parameters,
                         consistencyThreshold: newParameters.consistencyThreshold,
-                        typeOfRules: newParameters.typeOfRules
+                        typeOfRules: newParameters.typeOfRules,
+                        filterSelector: newParameters.filterSelector
                     };
                     projectCopy.parametersSaved = true;
 
@@ -514,6 +519,17 @@ class Rules extends Component {
             }));
         }
     };
+    
+    onFilterSelectorChange = (filterTxt) => {
+        const { loading } = this.state;
+
+        if (!loading) {
+            this.setState(({parameters}) => ({
+                parameters: {...parameters, filterSelector: filterTxt},
+                parametersSaved: false
+            }));
+        }
+    };
 
     onTypeOfRulesChange = (event) => {
         const { loading } = this.state;
@@ -669,6 +685,12 @@ class Rules extends Component {
                         onChange={this.onConsistencyThresholdChange}
                         value={parameters.consistencyThreshold}
                         variant={"extended"}
+                    />
+                    <FilterSelector
+                        TextFieldProps={{
+                            onChange: event => this.onFilterSelectorChange(event.target.value),
+                            value: parameters.filterSelector
+                        }}
                     />
                 </CustomDrawer>
                 <CustomBox customScrollbar={true} id={"rules-content"} variant={"TabBody"}>
