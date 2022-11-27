@@ -1,11 +1,11 @@
 package pl.put.poznan.rulestudio.model.parameters;
 
+import java.util.Objects;
+
 import pl.put.poznan.rulestudio.enums.ClassifierType;
 import pl.put.poznan.rulestudio.enums.DefaultClassificationResultType;
 import pl.put.poznan.rulestudio.enums.RuleType;
 import pl.put.poznan.rulestudio.enums.UnionType;
-
-import java.util.Objects;
 
 public class CrossValidationParametersImpl implements CrossValidationParameters, ClassificationParameters, RulesParameters {
 
@@ -17,8 +17,8 @@ public class CrossValidationParametersImpl implements CrossValidationParameters,
 
     private Long seed;
 
-    public CrossValidationParametersImpl(UnionType typeOfUnions, Double consistencyThreshold, RuleType typeOfRules, ClassifierType classifierType, DefaultClassificationResultType defaultClassificationResultType, Integer numberOfFolds, Long seed) {
-        this.rulesParameters = RulesParametersImpl.getInstance(typeOfUnions, consistencyThreshold, typeOfRules);
+    public CrossValidationParametersImpl(UnionType typeOfUnions, Double consistencyThreshold, RuleType typeOfRules, String filterSelector, ClassifierType classifierType, DefaultClassificationResultType defaultClassificationResultType, Integer numberOfFolds, Long seed) {
+        this.rulesParameters = RulesParametersImpl.getInstance(typeOfUnions, consistencyThreshold, typeOfRules, filterSelector);
         this.classificationParameters = new ClassificationParametersImpl(classifierType, defaultClassificationResultType);
         this.numberOfFolds = numberOfFolds;
         this.seed = seed;
@@ -35,6 +35,10 @@ public class CrossValidationParametersImpl implements CrossValidationParameters,
     public RuleType getTypeOfRules() {
         return rulesParameters.getTypeOfRules();
     }
+    
+	public String getFilterSelector() {
+		return rulesParameters.getFilterSelector();
+	}
 
     public ClassifierType getClassifierType() {
         return classificationParameters.getClassifierType();
