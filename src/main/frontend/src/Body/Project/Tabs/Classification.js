@@ -55,7 +55,7 @@ class Classification extends Component {
             externalData: false,
             parameters: {
                 defaultClassificationResultType: "majorityDecisionClass",
-                classifierType: "SimpleRuleClassifier",
+                classifierType: "SimpleOptimizingCountingRuleClassifier",
             },
             parametersSaved: true,
             refreshNeeded: {

@@ -71,7 +71,7 @@ class CrossValidation extends Component {
                 defaultClassificationResultType: "majorityDecisionClass",
                 numberOfFolds: 10,
                 seed: 0,
-                classifierType: "SimpleRuleClassifier",
+                classifierType: "SimpleOptimizingCountingRuleClassifier",
                 typeOfRules: "certain",
                 typeOfUnions: "monotonic",
             },

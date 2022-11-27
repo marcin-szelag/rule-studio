@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { makeStyles } from "@material-ui/core/styles";
 import CircleHelper from "../../../Utils/Feedback/CircleHelper";
 import CustomTextField from "../../../Utils/Inputs/CustomTextField";
 import CustomTooltip from "../../../Utils/DataDisplay/CustomTooltip";
@@ -9,15 +10,25 @@ const tooltip = {
     main: 	" is used to filter generated rules using their characteristics. " +
     		"It is possible to supply many filtering conditions concerning different rule characteristics. " +
     		"Particular filtering conditions have to be separated using &. " +
-    		"Each filtering condition has to be in the form: characteristic R threshold. " +
-    		"Allowed values of characteristics are: support, strength, confidence, coverage-factor, coverage, negative-coverage, length, " +
-    		"epsilon, epsilon', F, A, Z, L, c1, S (the last six concerning confirmation measures). " +
-    		"Allowed relations (to be put instead of R) are: >, >=, =, <=, <. " +
-    		"Exemplary composite filter: support >= 5 & length <= 2. " +
-    		"White spaces are ignored, so the above filter is equivalent to support>=5&length<=2. " +
-    		"Exemplary simple filter: confidence>0.5. " +
-    		"If all rules should be considered (i.e., no filtering should be performed), then rule filter input field should be left blank."
+    		"Each filtering condition has to be in the form: characteristic R threshold. ",
+    characteristics: " are: support, strength, confidence, coverage-factor, coverage, negative-coverage, length, " +
+    		"epsilon, epsilon', F, A, Z, L, c1, S (the last six concerning confirmation measures). ",
+    relations: " (to be put instead of R) are: >, >=, =, <=, <. ",
+    example1: ": support >= 5 & length <= 2. " +
+    		"White spaces are ignored, so the above filter is equivalent to support>=5&length<=2. ",
+    example2: ": confidence>0.5. ",
+    nofilter: " (i.e., not to perform rule filtering), rule filter input field should be left blank."
 };
+
+const useStyles = makeStyles({
+    maxWidth: {
+        maxWidth: 360
+    },
+    paragraph: {
+        margin: 0,
+        textAlign: "justify"
+    }
+}, {name: "MultiRow"});
 
 /**
  * <h3>Overview</h3>
@@ -34,15 +45,39 @@ const tooltip = {
  */
 function FilterSelector(props) {
     const { CircleHelperProps, TextFieldProps: { value, ...other } } = props;
+    const classes = useStyles();
 
     return (
         <div aria-label={"outer wrapper"} className={styles.OuterWrapper} style={props.style}>
             <CircleHelper
+            	multiRow={true}
                 title={
-                    <p aria-label={"main"} style={{margin: 0, textAlign: "justify"}}>
-                    	<b>Rule filter</b>
-                        {tooltip.main}
-                    </p>
+            		<React.Fragment>
+	                    <p aria-label={"main"} className={classes.paragraph}>
+	                    	<b>Rule filter</b>
+	                        {tooltip.main}
+	                    </p>
+	                    <p aria-label={"filter-characteristics"} className={classes.paragraph}>
+	                		<b>Allowed values of characteristics</b>
+	                		{tooltip.characteristics}
+	                	</p>
+	                	<p aria-label={"filter-relations"} className={classes.paragraph}>
+	            			<b>Allowed relations</b>
+	            			{tooltip.relations}
+	            		</p>
+	            		<p aria-label={"filter-example1"} className={classes.paragraph}>
+	        				<b>Exemplary composite filter</b>
+	        				{tooltip.example1}
+	        			</p>
+	        			<p aria-label={"filter-example2"} className={classes.paragraph}>
+	    					<b>Exemplary simple filter</b>
+	    					{tooltip.example2}
+	    				</p>
+	    				<p aria-label={"filter-blank"} className={classes.paragraph}>
+							<b>To consider all induced rules</b>
+							{tooltip.nofilter}
+						</p>
+					</React.Fragment>
                 }
                 WrapperProps={{
                     style: { marginRight: 16 }
