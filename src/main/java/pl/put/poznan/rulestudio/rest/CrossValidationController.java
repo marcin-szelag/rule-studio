@@ -1,19 +1,37 @@
 package pl.put.poznan.rulestudio.rest;
 
+import java.io.IOException;
+import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import pl.put.poznan.rulestudio.enums.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import pl.put.poznan.rulestudio.enums.ClassifierType;
+import pl.put.poznan.rulestudio.enums.DefaultClassificationResultType;
+import pl.put.poznan.rulestudio.enums.MisclassificationMatrixType;
+import pl.put.poznan.rulestudio.enums.RuleType;
+import pl.put.poznan.rulestudio.enums.UnionType;
 import pl.put.poznan.rulestudio.model.parameters.CrossValidationParameters;
 import pl.put.poznan.rulestudio.model.parameters.CrossValidationParametersImpl;
-import pl.put.poznan.rulestudio.model.response.*;
+import pl.put.poznan.rulestudio.model.response.AttributeFieldsResponse;
+import pl.put.poznan.rulestudio.model.response.ChosenClassifiedObjectAbstractResponse;
+import pl.put.poznan.rulestudio.model.response.ChosenCrossValidationFoldResponse;
+import pl.put.poznan.rulestudio.model.response.ChosenRuleResponse;
+import pl.put.poznan.rulestudio.model.response.DescriptiveAttributesResponse;
+import pl.put.poznan.rulestudio.model.response.MainCrossValidationResponse;
+import pl.put.poznan.rulestudio.model.response.ObjectAbstractResponse;
+import pl.put.poznan.rulestudio.model.response.OrdinalMisclassificationMatrixAbstractResponse;
+import pl.put.poznan.rulestudio.model.response.RuleMainPropertiesResponse;
 import pl.put.poznan.rulestudio.service.CrossValidationService;
-
-import java.io.IOException;
-import java.util.UUID;
 
 @CrossOrigin
 @RequestMapping("projects/{id}/crossValidation")
@@ -46,13 +64,15 @@ public class CrossValidationController {
             @RequestParam(name = "typeOfUnions") UnionType typeOfUnions,
             @RequestParam(name = "consistencyThreshold") Double consistencyThreshold,
             @RequestParam(name = "typeOfRules") RuleType typeOfRules,
+            @RequestParam(name = "filterSelector") String filterSelector,
             @RequestParam(name = "classifierType") ClassifierType classifierType,
             @RequestParam(name = "defaultClassificationResultType") DefaultClassificationResultType defaultClassificationResultType,
             @RequestParam(name = "numberOfFolds") Integer numberOfFolds,
             @RequestParam(name = "seed", defaultValue = "0") Long seed) {
         logger.info("[START] Putting cross validation...");
 
-        final CrossValidationParameters crossValidationParameters = new CrossValidationParametersImpl(typeOfUnions, consistencyThreshold, typeOfRules, classifierType, defaultClassificationResultType, numberOfFolds, seed);
+        final CrossValidationParameters crossValidationParameters = new CrossValidationParametersImpl(
+        		typeOfUnions, consistencyThreshold, typeOfRules, filterSelector, classifierType, defaultClassificationResultType, numberOfFolds, seed);
         final MainCrossValidationResponse result = crossValidationService.putCrossValidation(id, crossValidationParameters);
 
         logger.info("[ END ] Putting cross validation is done.");
@@ -65,6 +85,7 @@ public class CrossValidationController {
             @RequestParam(name = "typeOfUnions") UnionType typeOfUnions,
             @RequestParam(name = "consistencyThreshold") Double consistencyThreshold,
             @RequestParam(name = "typeOfRules") RuleType typeOfRules,
+            @RequestParam(name = "filterSelector") String filterSelector,
             @RequestParam(name = "classifierType") ClassifierType classifierType,
             @RequestParam(name = "defaultClassificationResultType") DefaultClassificationResultType defaultClassificationResultType,
             @RequestParam(name = "numberOfFolds") Integer numberOfFolds,
@@ -73,7 +94,8 @@ public class CrossValidationController {
             @RequestParam(name = "data") String data) throws IOException {
         logger.info("[START] Posting cross validation...");
 
-        final CrossValidationParameters crossValidationParameters = new CrossValidationParametersImpl(typeOfUnions, consistencyThreshold, typeOfRules, classifierType, defaultClassificationResultType, numberOfFolds, seed);
+        final CrossValidationParameters crossValidationParameters = new CrossValidationParametersImpl(
+        		typeOfUnions, consistencyThreshold, typeOfRules, filterSelector, classifierType, defaultClassificationResultType, numberOfFolds, seed);
         final MainCrossValidationResponse result = crossValidationService.postCrossValidation(id, crossValidationParameters, metadata, data);
 
         logger.info("[ END ] Posting cross validation is done.");

@@ -1,12 +1,13 @@
 package pl.put.poznan.rulestudio.model.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.function.Supplier;
+
 import org.rulelearn.core.UnknownValueException;
 import org.rulelearn.rules.RuleCharacteristics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.Supplier;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RuleCharacteristicsBean {
     private static final Logger logger = LoggerFactory.getLogger(RuleCharacteristicsBean.class);
@@ -35,7 +36,7 @@ public class RuleCharacteristicsBean {
     @JsonProperty("Epsilon prime measure")
     private Object epsilonPrime;
 
-    @JsonProperty("f-confirmation measure")
+    @JsonProperty("F-confirmation measure")
     private Object fConfirmation;
 
     @JsonProperty("A-confirmation measure")
@@ -44,14 +45,17 @@ public class RuleCharacteristicsBean {
     @JsonProperty("Z-confirmation measure")
     private Object zConfirmation;
 
-    @JsonProperty("l-confirmation measure")
+    @JsonProperty("L-confirmation measure")
     private Object lConfirmation;
 
     @JsonProperty("c1-confirmation measure")
     private Object c1Confirmation;
 
-    @JsonProperty("s-confirmation measure")
+    @JsonProperty("S-confirmation measure")
     private Object sConfirmation;
+    
+    @JsonProperty("Length")
+    private Object length;
 
     public RuleCharacteristicsBean(RuleCharacteristics ruleCharacteristics) {
         this.support = getValueOfCharacteristic(ruleCharacteristics::getSupport, "Support");
@@ -62,12 +66,13 @@ public class RuleCharacteristicsBean {
         this.negativeCoverage = getValueOfCharacteristic(ruleCharacteristics::getNegativeCoverage, "Negative coverage");
         this.epsilon = getValueOfCharacteristic(ruleCharacteristics::getEpsilon, "Epsilon measure");
         this.epsilonPrime = getValueOfCharacteristic(ruleCharacteristics::getEpsilonPrime, "Epsilon prime measure");
-        this.fConfirmation = getValueOfCharacteristic(ruleCharacteristics::getFConfirmation, "f-confirmation measure");
+        this.fConfirmation = getValueOfCharacteristic(ruleCharacteristics::getFConfirmation, "F-confirmation measure");
         this.aConfirmation = getValueOfCharacteristic(ruleCharacteristics::getAConfirmation, "A-confirmation measure");
         this.zConfirmation = getValueOfCharacteristic(ruleCharacteristics::getZConfirmation, "Z-confirmation measure");
-        this.lConfirmation = getValueOfCharacteristic(ruleCharacteristics::getLConfirmation, "l-confirmation measure");
+        this.lConfirmation = getValueOfCharacteristic(ruleCharacteristics::getLConfirmation, "L-confirmation measure");
         this.c1Confirmation = getValueOfCharacteristic(ruleCharacteristics::getC1Confirmation, "c1-confirmation measure");
-        this.sConfirmation = getValueOfCharacteristic(ruleCharacteristics::getSConfirmation, "s-confirmation measure");
+        this.sConfirmation = getValueOfCharacteristic(ruleCharacteristics::getSConfirmation, "S-confirmation measure");
+        this.length = getValueOfCharacteristic(ruleCharacteristics::getNumberOfConditions, "Length");
     }
 
     private <T extends Number> Object getValueOfCharacteristic(Supplier<T> function, String fieldName) {
@@ -158,6 +163,10 @@ public class RuleCharacteristicsBean {
     public Object getsConfirmation() {
         return sConfirmation;
     }
+    
+    public Object getLength() {
+        return length;
+    }
 
     @Override
     public String toString() {
@@ -176,6 +185,7 @@ public class RuleCharacteristicsBean {
                 ", lConfirmation=" + lConfirmation +
                 ", c1Confirmation=" + c1Confirmation +
                 ", sConfirmation=" + sConfirmation +
+                ", length=" + length +
                 '}';
     }
 }
