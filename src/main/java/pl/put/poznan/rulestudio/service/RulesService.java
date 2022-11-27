@@ -235,6 +235,7 @@ public class RulesService {
                     new EvaluationAndCoverageStoppingConditionChecker(
                             EpsilonConsistencyMeasure.getInstance(),
                             EpsilonConsistencyMeasure.getInstance(),
+                            EpsilonConsistencyMeasure.getInstance(),
                             ((VCDominanceBasedRoughSetCalculator) unions.getRoughSetCalculator()).getLowerApproximationConsistencyThreshold()
                     );
 
