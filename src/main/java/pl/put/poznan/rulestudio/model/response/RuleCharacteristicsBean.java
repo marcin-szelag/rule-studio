@@ -53,6 +53,9 @@ public class RuleCharacteristicsBean {
 
     @JsonProperty("S-confirmation measure")
     private Object sConfirmation;
+    
+    @JsonProperty("Length")
+    private Object length;
 
     public RuleCharacteristicsBean(RuleCharacteristics ruleCharacteristics) {
         this.support = getValueOfCharacteristic(ruleCharacteristics::getSupport, "Support");
@@ -69,6 +72,7 @@ public class RuleCharacteristicsBean {
         this.lConfirmation = getValueOfCharacteristic(ruleCharacteristics::getLConfirmation, "L-confirmation measure");
         this.c1Confirmation = getValueOfCharacteristic(ruleCharacteristics::getC1Confirmation, "c1-confirmation measure");
         this.sConfirmation = getValueOfCharacteristic(ruleCharacteristics::getSConfirmation, "S-confirmation measure");
+        this.length = getValueOfCharacteristic(ruleCharacteristics::getNumberOfConditions, "Length");
     }
 
     private <T extends Number> Object getValueOfCharacteristic(Supplier<T> function, String fieldName) {
@@ -159,6 +163,10 @@ public class RuleCharacteristicsBean {
     public Object getsConfirmation() {
         return sConfirmation;
     }
+    
+    public Object getLength() {
+        return length;
+    }
 
     @Override
     public String toString() {
@@ -177,6 +185,7 @@ public class RuleCharacteristicsBean {
                 ", lConfirmation=" + lConfirmation +
                 ", c1Confirmation=" + c1Confirmation +
                 ", sConfirmation=" + sConfirmation +
+                ", length=" + length +
                 '}';
     }
 }
