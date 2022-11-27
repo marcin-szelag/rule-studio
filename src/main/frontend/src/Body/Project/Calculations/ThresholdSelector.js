@@ -70,7 +70,7 @@ class ThresholdSelector extends Component {
             input = input.replace(",", ".");
         }
 
-        if (!isNaN(Number(input)) && input.length < 5) {
+        if (!isNaN(Number(input)) && input.length < 6) {
             const regEx = new RegExp(/^[01]\.[0-9]*$/);
             const typingInProgress = input === "" || regEx.test(input);
             this.setState({
@@ -140,7 +140,7 @@ class ThresholdSelector extends Component {
                     min={0.0}
                     onChange={this.onSliderChange}
                     onChangeCommitted={this.onSliderChangeCommitted}
-                    step={0.01}
+                    step={0.001}
                     style={{ marginRight: 24, maxWidth: 72, minWidth: 60}}
                     value={typeof threshold === "number" ? threshold : 0.0}
                     {...SliderProps}
