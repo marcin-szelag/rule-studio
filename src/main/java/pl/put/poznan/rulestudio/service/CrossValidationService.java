@@ -120,7 +120,7 @@ public class CrossValidationService {
 
         CrossValidator crossValidator = new CrossValidator(new Random());
         crossValidator.setSeed(crossValidationParameters.getSeed());
-        List<CrossValidator.CrossValidationFold<InformationTable>> folds = crossValidator.splitStratifiedIntoKFold(DataService.createInformationTableWithDecisionDistributions(informationTable), numberOfFolds);
+        List<CrossValidator.CrossValidationFold<InformationTable>> folds = crossValidator.splitStratifiedIntoKFolds(DataService.createInformationTableWithDecisionDistributions(informationTable), numberOfFolds);
         for(i = 0; i < folds.size(); i++) {
             logger.info("Creating fold: {}/{}", i+1, folds.size());
 

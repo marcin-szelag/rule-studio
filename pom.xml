@@ -11,7 +11,7 @@
     <parent>
         <artifactId>spring-boot-starter-parent</artifactId>
         <groupId>org.springframework.boot</groupId>
-        <version>2.1.8.RELEASE</version>
+        <version>2.1.18.RELEASE</version><!-- forces GSON 2.8.6, which is a minimal version for ruleLearn -->
     </parent>
 
     <repositories>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>com.github.ruleLearn</groupId>
             <artifactId>rulelearn</artifactId>
-            <version>0.25.0-rc.2</version>
+            <version>0.25.0-rc.3</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
         <dependency>
