@@ -524,12 +524,11 @@ class CrossValidation extends Component {
             return;
         }
 
-        if (!loading) {
-	        this.setState(({parameters}) => ({
-	            parameters: {...parameters, consistencyThreshold: threshold},
-	            parametersSaved: false
-	        }));
-        }
+
+        this.setState(({parameters}) => ({
+            parameters: {...parameters, consistencyThreshold: threshold},
+            parametersSaved: false
+        }));
     };
     
     onFilterSelectorChange = (filterTxt) => {
