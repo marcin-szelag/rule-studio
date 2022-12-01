@@ -23,6 +23,7 @@ import org.rulelearn.rules.BasicRuleCoverageInformation;
 import org.rulelearn.rules.CertainRuleInducerComponents;
 import org.rulelearn.rules.CompositeRuleCharacteristicsFilter;
 import org.rulelearn.rules.EvaluationAndCoverageStoppingConditionChecker;
+import org.rulelearn.rules.OptimizingRuleConditionsGeneralizer;
 import org.rulelearn.rules.PossibleRuleInducerComponents;
 import org.rulelearn.rules.Rule;
 import org.rulelearn.rules.RuleCharacteristics;
@@ -285,11 +286,12 @@ public class RulesService {
             ruleInducerComponents = new CertainRuleInducerComponents.Builder().
                     ruleInductionStoppingConditionChecker(stoppingConditionChecker).
                     ruleConditionsPruner(new AttributeOrderRuleConditionsPruner(stoppingConditionChecker)).
+                    ruleConditionsGeneralizer(new OptimizingRuleConditionsGeneralizer(stoppingConditionChecker)).
                     build();
 
             rules = (new VCDomLEM(ruleInducerComponents, unionAtLeastProvider, unionRuleDecisionsProvider)).generateAndFilterRules(CompositeRuleCharacteristicsFilter.of(filterSelector));
             rules.calculateAllCharacteristics();
-            if(resultSet == null) {
+            if (resultSet == null) {
                 resultSet = rules;
             } else {
                 resultSet = RuleSetWithCharacteristics.join(resultSet, rules);
