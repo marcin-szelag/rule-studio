@@ -44,3 +44,7 @@ see the [LICENSE](https://github.com/dominieq/rule-work/blob/master/LICENSE) fil
   - [react-virtualized](https://github.com/bvaughn/react-virtualized) to efficiently display massive amounts of data. 
   - [react-router](https://github.com/ReactTraining/react-router), [BigNumber](https://github.com/MikeMcl/bignumber.js).
 - We used [frontend-maven-plugin](https://github.com/eirslett/frontend-maven-plugin) to package our application to a single JAR file.
+
+## Disclaimer
+- Current version of RuLeStudio does not yet support application of a *Naive Bayes* classifer to classify an object when there is no decision rule matching that object - *default classification result* will be returned in such case.
+- Current version of RuLeStudio does not yet implement *Scoring Rule Classifier* and *Hybrid Scoring Rule Classifier* - if any of these classifiers is chosen in GUI, in fact default classification result will be returned for each classified object.
