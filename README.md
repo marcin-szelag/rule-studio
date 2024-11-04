@@ -5,7 +5,7 @@ to put into action it's core functionalities and display them in user-friendly m
 ## Quick start
 **NOTE: You need to have Java (version at least 1.8) installed and available from command line!**
 
-Go to [releases](https://github.com/dominieq/rule-studio/releases) and choose your version of RuLeStudio. 
+Go to [releases](https://github.com/marcin-szelag/rule-studio/releases) and choose your version of RuLeStudio. 
 The latest release should contain a manual and example data set.
 Once you've downloaded the application, run it by using the following command:
 ````
